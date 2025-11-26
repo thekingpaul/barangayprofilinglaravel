@@ -21,9 +21,24 @@ COPY . .
 # Install PHP dependencies
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader
 
+# Ensure persistent SQLite database exists
+RUN mkdir -p /var/data \
+    && touch /var/data/database.sqlite \
+    && chmod -R 777 /var/data
+
+# Ensure Laravel storage and cache are writable
+RUN chmod -R 777 storage bootstrap/cache
+
 # Setup Laravel environment
-RUN cp .env.example .env
-RUN php artisan key:generate
+RUN if [ ! -f .env ]; then \
+        cp .env.example .env || echo "APP_KEY=base64:$(php -r 'echo base64_encode(random_bytes(32));')" > .env; \
+    fi
+
+# Clear caches to pick up environment
+RUN php artisan config:clear \
+    && php artisan cache:clear \
+    && php artisan route:clear \
+    && php artisan view:clear
 
 # Expose port
 EXPOSE 8000
