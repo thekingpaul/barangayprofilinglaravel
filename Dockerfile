@@ -20,6 +20,7 @@ RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader
 # Node dependencies and Vite build
 RUN npm install
 RUN npm run build
+RUN npm run dev
 
 # SQLite
 RUN mkdir -p /var/data && touch /var/data/database.sqlite && chmod -R 777 /var/data
@@ -37,6 +38,5 @@ RUN php artisan config:clear \
     && php artisan route:clear \
     && php artisan view:clear
 
-EXPOSE 8000 5173
-# Start Vite in background, then Laravel
-CMD npm run dev & php artisan serve --host=0.0.0.0 --port=8000
+EXPOSE 8000
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
