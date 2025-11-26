@@ -20,7 +20,7 @@ RUN COMPOSER_MEMORY_LIMIT=-1 composer install --no-dev --optimize-autoloader
 # Node dependencies and Vite build
 RUN npm install
 RUN npm run build
-RUN npm run dev
+RUN npm run dev -- --host 0.0.0.0
 
 # SQLite
 RUN mkdir -p /var/data && touch /var/data/database.sqlite && chmod -R 777 /var/data
